@@ -24,6 +24,13 @@ public class Test {
         cDuck.performFly();
         cDuck.setFlyBehavior(new FlyWithWings());
         cDuck.performFly();
+
+        System.out.println("---------------------");
+        DDuck dDuck = new DDuck();
+        dDuck.display();
+//        dDuck.performFly();
+//        dDuck.performQuack();
+
     }
 
 }
