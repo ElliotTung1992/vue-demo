@@ -1,4 +1,4 @@
-package com.github.designmode.demo;
+package com.github.design_mode.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
