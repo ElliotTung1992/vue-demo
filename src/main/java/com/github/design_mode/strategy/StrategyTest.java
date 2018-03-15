@@ -119,6 +119,7 @@ class StrategyFactory{
         }
     }
 
+    //单例
     StrategyFactory(){
         init();
     }
