@@ -1,16 +1,16 @@
 package com.github.design_mode.strategy;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.lang.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class StrategyTest {
 
     public static void main(String[] args) {
 
-        Human human = new Human("小明", 2000);
+        Human human = new Human("小明", 990);
 
        /*
         用一个工厂方法来封装
@@ -52,10 +52,14 @@ class StrategyFactory{
         return strategy;
         }
     */
+    //策略子集所在的包
     private static final String STRATEGY_PACKAGE = "com.github.design_mode.strategy";
+    //存放策略子集的集合
     private List<Class<? extends Strategy>> strategyList;
+    //类加载器
     private ClassLoader classLoader = getClass().getClassLoader();
 
+    //根据传进来的参数返回对应的策略实例
     public Strategy createStrategy(int distance){
         for (Class<? extends Strategy> clazz:strategyList) {
             DistanceSection distanceSection = handleAnnotation(clazz);
@@ -72,6 +76,7 @@ class StrategyFactory{
         return null;
     }
 
+    //把加上@DistanceSection的策略子集返回注解信息
     private DistanceSection handleAnnotation(Class<? extends Strategy> clazz) {
         Annotation[] declaredAnnotations = clazz.getDeclaredAnnotations();
         if(declaredAnnotations == null || declaredAnnotations.length == 0){
@@ -85,49 +90,66 @@ class StrategyFactory{
         return null;
     }
 
+    //找到策略子集并放入集合
     private void init() {
         strategyList = new ArrayList<Class<? extends Strategy>>();
         File[] resources = getResources();
         Class<Strategy> strategyClazz = null;
         try {
             strategyClazz = (Class<Strategy>) classLoader.loadClass(Strategy.class.getName());
-            for (int i = 0; i < resources.length; i++ ){
-                Class<?> clazz = classLoader.loadClass(STRATEGY_PACKAGE + "." + resources[i].getName().replace(".class", ""));
-                if(strategyClazz.isAssignableFrom(clazz) && clazz != strategyClazz){
-                    strategyList.add((Class<? extends Strategy>) clazz);
-                }
-            }
+//            for (int i = 0; i < resources.length; i++ ){
+//                Class<?> clazz = classLoader.loadClass(STRATEGY_PACKAGE + "." + resources[i].getName().replace(".class", ""));
+//                if(strategyClazz.isAssignableFrom(clazz) && clazz != strategyClazz){
+//                    strategyList.add((Class<? extends Strategy>) clazz);
+//                }
+//            }
+            Class<Strategy> finalStrategyClazz = strategyClazz;
+            IntStream.range(0, resources.length)
+                    .forEach(e -> {
+                        Class<?> clazz = null;
+                        try {
+                            clazz = classLoader.loadClass(STRATEGY_PACKAGE + "." + resources[e].getName().replace(".class", ""));
+                        } catch (ClassNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        if(finalStrategyClazz.isAssignableFrom(clazz) && clazz != finalStrategyClazz){
+                            strategyList.add((Class<? extends Strategy>) clazz);
+                        }
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    //获取包路径下的资源集
     private File[] getResources() {
         try {
             File file = new File(classLoader.getResource(STRATEGY_PACKAGE.replace(".", "/")).toURI());
-            return file.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    if(pathname.getName().endsWith(".class")){
-                        return true;
-                    }
-                    return false;
-                }
-            });
+//            return file.listFiles(new FileFilter() {
+//                @Override
+//                public boolean accept(File pathname) {
+//                    if(pathname.getName().endsWith(".class")){
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
+            return file.listFiles(e -> e.getName().endsWith(".class"));
         } catch (Exception e) {
             throw new RuntimeException("未找到策略资源");
         }
     }
 
-    //单例
     StrategyFactory(){
         init();
     }
+
 
     public static StrategyFactory getInstance(){
         return StrategyFactoryInstance.instance;
     }
 
+    //通过静态内部类实现单例
     private static class StrategyFactoryInstance{
         private static StrategyFactory instance = new StrategyFactory();
     }
