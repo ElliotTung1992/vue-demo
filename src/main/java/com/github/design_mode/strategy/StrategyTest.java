@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * 策略模式
+ */
 public class StrategyTest {
 
     public static void main(String[] args) {
