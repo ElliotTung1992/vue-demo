@@ -4,21 +4,15 @@ package com.github.design_mode.strategy.simple_demo;
 public class SimpleDemo {
 
     public static void main(String[] args) {
+
         Context context = new Context(null);
-        String type = "C";
-        if(type.equals("A")){
-            context.setStrategy(new StrategyA());
-        } else if(type.equals("B")){
-            context.setStrategy(new StrategyB());
-        } else if(type.equals("C")){
-            context.setStrategy(new StrategyC());
-        }
-        context.operate();
+        context.setStrategy(new StrategyC());
+        context.execution();
     }
 }
 
 //环境
-class Context implements Strategy{
+class Context {
 
     private Strategy strategy;
 
@@ -26,8 +20,7 @@ class Context implements Strategy{
         this.strategy = strategy;
     }
 
-    @Override
-    public void operate() {
+    public void execution() {
         strategy.operate();
     }
 

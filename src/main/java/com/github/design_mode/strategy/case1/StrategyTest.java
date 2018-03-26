@@ -1,4 +1,4 @@
-package com.github.design_mode.strategy;
+package com.github.design_mode.strategy.case1;
 
 import java.io.File;
 import java.lang.annotation.*;
